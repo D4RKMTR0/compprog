@@ -1,40 +1,43 @@
 #include <algorithm>
 #include <iostream>
+#include <utility>
+#include <iomanip>
 #include <vector>
-#include <cmath>
 using namespace std;
 
 int main() {
   int t;
   cin >> t;
 
-  vector<float> tower1;
-  vector<float> tower2;
-
   while (t--) {
     float n, x1, y1, x2, y2;
     cin >> n >> x1 >> y1 >> x2 >> y2;
 
-    while (n--) {
-      int x, y;
+    vector<pair<unsigned long long, unsigned long long>> h(n);
+
+    for (int i = 0; i < n; i++) {
+      unsigned long long x, y;
       cin >> x >> y;
 
-      float t1Distance = sqrt(pow(x1 - x, 2) + pow(y1 - y, 2)); 
-      float t2Distance = sqrt(pow(x2 - x, 2) + pow(y2 - y, 2));
-      if (t1Distance < t2Distance) {
-        tower1.push_back(t1Distance);
-      } else {
-        tower2.push_back(t2Distance);
-      }
+      h[i].first = (x1 - x) * (x1 - x) + (y1 - y) * (y1 - y);
+      h[i].second = (x2 - x) * (x2 - x) + (y2 - y) * (y2 - y);
     }
 
-    float t1Total = tower1.empty() ? 0.f : pow(*max_element(tower1.begin(), tower1.end()), 2.0f);
-    float t2Total = tower2.empty() ? 0.f : pow(*max_element(tower2.begin(), tower2.end()), 2.0f);
+    sort(h.begin(), h.end());
 
-    cout << (t1Total + t2Total) << '\n';
+    vector<unsigned long long> s(n + 1, 0);
 
-    tower1.clear();
-    tower2.clear();
+    for (int i = n - 1; i >= 0; i++) {
+      s[i] = max(s[i+1], h[i].second);
+    }
+
+    unsigned long long mt = ~0ULL;
+
+    for (int i = 0; i <= n; i++) {
+      mt = min(mt, (i > 0 ? h[i].first : 0) + s[i]);
+    }
+
+    cout << fixed << setprecision(9) << mt << '\n';
   }
 
   return 0;
